@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Julia 💌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            animation: float 6s ease-in infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+        }
+
+        .envelope {
+            width: 320px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe4e4 100%);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .envelope-flap {
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 120px solid #ffb6c1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: top center;
+            transition: transform 0.5s ease;
+        }
+
+        .heart-stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 40px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .to-julia {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            color: #d63384;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #d63384;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .explosion {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+        }
+
+        .flower-container {
+            position: fixed;
+            bottom: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: all 2s ease;
+            z-index: 50;
+        }
+
+        .flower-container.grow {
+            bottom: 20%;
+            opacity: 1;
+        }
+
+        .stem {
+            width: 8px;
+            height: 150px;
+            background: linear-gradient(180deg, #228b22 0%, #90ee90 100%);
+            margin: 0 auto;
+            border-radius: 4px;
+        }
+
+        .flower {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin: 0 auto;
+            animation: flowerBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes flowerBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .petal {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            border-radius: 50% 50% 0 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom left;
+        }
+
+        .petal:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg); }
+        .petal:nth-child(2) { transform: translate(-50%, -50%) rotate(72deg); }
+        .petal:nth-child(3) { transform: translate(-50%, -50%) rotate(144deg); }
+        .petal:nth-child(4) { transform: translate(-50%, -50%) rotate(216deg); }
+        .petal:nth-child(5) { transform: translate(-50%, -50%) rotate(288deg); }
+
+        .center {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #ffd700 0%, #ffa500 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .message {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 60;
+        }
+
+        .message.show {
+            opacity: 1;
+        }
+
+        .message h2 {
+            color: #d63384;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .message p {
+            color: #555;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="container">
+        <div class="envelope" id="envelope">
+            <div class="envelope-body">
+                <div class="envelope-flap"></div>
+                <div class="heart-stamp">💕</div>
+                <div class="to-julia">Para Julia</div>
+                <div class="click-hint">Clique 3x rápido! ✨</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="message" id="message">
+        <h2>Julia! 🌸</h2>
+        <p>Você é especial e ilumina o mundo ao seu redor. Esta flor é só uma pequena demonstração de carinho! 💖</p>
+    </div>
+
+    <div class="flower-container" id="flowerContainer">
+        <div class="flower">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="center"></div>
+        </div>
+        <div class="stem"></div>
+    </div>
+
+    <audio id="music" loop>
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADhAC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAA4T0eMWfAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xBkAA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const flowerContainer = document.getElementById('flowerContainer');
+        const message = document.getElementById('message');
+        const music = document.getElementById('music');
+        const heartsContainer = document.getElementById('hearts');
+        
+        let clickCount = 0;
+        let clickTimer;
+        
+        // Criar corações flutuantes
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = '💖';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 5 + 's';
+            heartsContainer.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 6000);
+        }
+        
+        setInterval(createHeart, 1500);
+        
+        // Criar explosão de partículas
+        function createExplosion() {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            document.body.appendChild(explosion);
+            
+            const colors = ['#ff69b4', '#ff1493', '#ffd700', '#ff6347', '#ba55d3'];
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = (Math.PI * 2 * i) / 30;
+                const velocity = 200 + Math.random() * 100;
+                
+                particle.style.animation = `explode 1s ease-out forwards`;
+                particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+                particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+                
+                explosion.appendChild(particle);
+            }
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes explode {
+                    to {
+                        transform: translate(var(--tx), var(--ty));
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            setTimeout(() => {
+                explosion.remove();
+                style.remove();
+            }, 1000);
+        }
+        
+        envelope.addEventListener('click', () => {
+            clickCount++;
+            
+            clearTimeout(clickTimer);
+            
+            if (clickCount === 3) {
+                // Explosão!
+                createExplosion();
+                envelope.style.transform = 'scale(0)';
+                envelope.style.opacity = '0';
+                
+                setTimeout(() => {
+                    envelope.classList.add('hidden');
+                    flowerContainer.classList.add('grow');
+                    message.classList.add('show');
+                    
+                    // Tocar música (nota: sem source real, mas estrutura pronta)
+                    music.play().catch(e => console.log('Áudio requer interação do usuário'));
+                }, 500);
+                
+                clickCount = 0;
+            } else {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
